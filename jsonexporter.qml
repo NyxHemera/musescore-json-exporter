@@ -35,8 +35,41 @@ MuseScore {
 		}
 		console.log(startStaff + " - " + endStaff + " - " + endTick);
 
-		return [startStaff, endStaff, endTick, fullScore];
+		return [startStaff, endStaff, endTick, fullScore, cursor];
 
+	}
+
+	function grabNotes(selectArr) {
+		var startStaff = selectArr[0];
+		var endStaff = selectArr[1];
+		var endTick = selectArr[2];
+		var fullScore = selectArr[3];
+		var cursor = selectArr[4];
+		for (var staff = startStaff; staff <= endStaff; staff++) {
+			for (var voice = 0; voice < 4; voice++) {
+				cursor.rewind(1); // sets voice to 0
+				cursor.voice = voice; //voice has to be set after goTo
+				cursor.staffIdx = staff;
+
+				if (fullScore)
+					cursor.rewind(0) // if no selection, beginning of score
+
+				while (cursor.segment && (fullScore || cursor.tick < endTick)) {
+					if (cursor.element && cursor.element.type == Element.CHORD) {
+						var notes = cursor.element.notes;
+						for (var i = 0; i < notes.length; i++) {
+							var note = notes[i];
+							//func(note);
+							console.log(note.pitch + " - " + note.headType);
+						}
+					}else if(cursor.element && cursor.element.type == Element.REST) {
+						var rest = cursor.element;
+						console.log(rest.durationType);
+					}
+					cursor.next();
+				}
+			}
+		}
 	}
 
 
@@ -44,6 +77,7 @@ MuseScore {
 		console.log("jsonexporter started");
 		var select = grabSelection();
 		console.log(select);
+		grabNotes(select);
 		console.log("About to Quit");
 		Qt.quit();
 	}
