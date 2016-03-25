@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import FileIO 1.0
 import MuseScore 1.0
 
 MuseScore {
@@ -80,12 +81,23 @@ MuseScore {
 		return noteObj;
 	}
 
+	FileIO {
+		id: file
+		onError: console.log("FileIO Error")
+		source: file.tempPath() + "/song.json";
+	}
+
+	function writeToFile(noteObj) {
+		console.log("Does file exist? " + file.exists());
+		console.log("Did the file write successfully? " + file.write(JSON.stringify(noteObj))); //writes the file
+		console.log("The file exists here: " + file.source);
+	}
+
 
 	onRun: {
-		console.log("jsonexporter started");
 		var select = grabSelection();
 		var noteObj = grabNotes(select);
-		console.log("About to Quit");
+		writeToFile(noteObj);
 		Qt.quit();
 	}
 
