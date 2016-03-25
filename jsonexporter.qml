@@ -45,6 +45,9 @@ MuseScore {
 		var endTick = selectArr[2];
 		var fullScore = selectArr[3];
 		var cursor = selectArr[4];
+		var noteObj = {};
+		var numNotes = 0;
+
 		for (var staff = startStaff; staff <= endStaff; staff++) {
 			for (var voice = 0; voice < 4; voice++) {
 				cursor.rewind(1); // sets voice to 0
@@ -59,25 +62,29 @@ MuseScore {
 						var notes = cursor.element.notes;
 						for (var i = 0; i < notes.length; i++) {
 							var note = notes[i];
-							//func(note);
-							console.log(note.pitch + " - " + note.headType);
+							//console.log(note.pitch + " - " + note.headType);
+							var name = "note" + numNotes++;
+							noteObj[name] = {pitch:note.pitch, type:note.headType};
 						}
 					}else if(cursor.element && cursor.element.type == Element.REST) {
 						var rest = cursor.element;
-						console.log(rest.durationType);
+						//console.log(rest.durationType);
+						var name = "note" + numNotes++;
+						noteObj[name] = {pitch:"REST", type:rest.durationType};
 					}
 					cursor.next();
 				}
 			}
 		}
+		console.log("numNotes" + numNotes);
+		return noteObj;
 	}
 
 
 	onRun: {
 		console.log("jsonexporter started");
 		var select = grabSelection();
-		console.log(select);
-		grabNotes(select);
+		var noteObj = grabNotes(select);
 		console.log("About to Quit");
 		Qt.quit();
 	}
